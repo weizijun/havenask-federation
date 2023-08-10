@@ -78,7 +78,7 @@ public class BizConfig {
 
     public static class OfflineIndexConfig {
         public BuildConfig build_config = new BuildConfig();
-        public MergeConfig merge_config = new MergeConfig();
+        // public MergeConfig merge_config = new MergeConfig();
     }
 
     public static class ClusterConfig {

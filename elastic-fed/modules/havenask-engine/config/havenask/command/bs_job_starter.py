@@ -20,24 +20,31 @@ if __name__ == '__main__':
     if (len(sys.argv) > 6):
         realtimeInfo = sys.argv[6]
 
+    # mkdir runtime_path/index_name
+    final_work_path = os.path.join(runtime_path, index_name)
+    if False == os.path.exists(final_work_path):
+        executCmd("mkdir -p %s" % final_work_path)
 
-    final_work_path = os.path.join(work_path, index_name)
-    if os.path.exists(final_work_path):
-        os.system("rm -rf %s" % final_work_path)
-    os.system("mkdir -p %s" % final_work_path)
-    cmd = "/ha3_install/usr/local/bin/bs startjob -c %s/table -n %s -j local -m full -d %s -w %s -i %s -p 1 --documentformat=ha3" % (config_path, index_name, data_path, final_work_path, runtime_path)
-    if realtimeInfo:
-        cmd += " --realtimeInfo='%s'" % realtimeInfo
 
-    index_data_path = os.path.join(runtime_path, index_name)
-    index_data_generation_path = os.path.join(runtime_path, index_name, "generation_0")
-    for x in range(5):
-        code = executCmd(cmd)
-        if os.path.exists(index_data_generation_path):
-            sys.exit(code)
-            break
-        else:
-            print "index data generation failed, retrying..."
-            os.system("rm -rf %s" % index_data_path)
 
-    sys.exit(code)
+
+#     final_work_path = os.path.join(work_path, index_name)
+#     if os.path.exists(final_work_path):
+#         os.system("rm -rf %s" % final_work_path)
+#     os.system("mkdir -p %s" % final_work_path)
+#     cmd = "/ha3_install/usr/local/bin/bs startjob -c %s/table -n %s -j local -m full -d %s -w %s -i %s -p 1 --documentformat=ha3" % (config_path, index_name, data_path, final_work_path, runtime_path)
+#     if realtimeInfo:
+#         cmd += " --realtimeInfo='%s'" % realtimeInfo
+#
+#     index_data_path = os.path.join(runtime_path, index_name)
+#     index_data_generation_path = os.path.join(runtime_path, index_name, "generation_0")
+#     for x in range(5):
+#         code = executCmd(cmd)
+#         if os.path.exists(index_data_generation_path):
+#             sys.exit(code)
+#             break
+#         else:
+#             print "index data generation failed, retrying..."
+#             os.system("rm -rf %s" % index_data_path)
+#
+#     sys.exit(code)

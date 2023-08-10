@@ -1132,15 +1132,23 @@ examples:
                     has_realtime = False
                     if tableName != "in0" :
                         has_realtime = True
+
+                    generationList = os.listdir(os.path.join(self.indexPath, tableName))
+                    if generationList == []:
+                        has_offline_index = False
                     if tabletInfos.has_key(tableName):
                         has_offline_index = tabletInfos[tableName]['has_offline_index']
                         has_realtime = True
+
                     if has_offline_index:
                         curTableGid = self._getMaxGenerationId(self.indexPath, tableName)
                         curTablePartitions = self._getPartitions(self.indexPath, tableName, curTableGid)
-                    else:
+                    elif tabletInfos.has_key(tableName):
                         curTableGid = tabletInfos[tableName]["generationId"]
                         curTablePartitions = tabletInfos[tableName]["partitions"]
+                    else :
+                        curTableGid = 0
+                        curTablePartitions = ["0_65535"]
                     if not self.enableMultiPartition :
                         curTablePartitionCnt = len(curTablePartitions)
                         if curTablePartitionCnt == 1:
