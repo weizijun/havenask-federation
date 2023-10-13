@@ -96,8 +96,10 @@ public class HavenaskStore extends Store {
 
         String entryTableFile = HAVENASK_ENTRY_TABLE_FILE_PREFIX + commitVersion;
         Path entryTablePath = shardPath.resolve(entryTableFile);
+        String entryTablePathStr = entryTableFile;
         if (false == Strings.isEmpty(fenceName)) {
             entryTablePath = shardPath.resolve(fenceName).resolve(entryTableFile);
+            entryTablePathStr = fenceName + "/" + entryTableFile;
         }
         String entryTableContent = Files.readString(entryTablePath);
         EntryTable entryTable = EntryTable.parse(entryTableContent);
@@ -112,7 +114,7 @@ public class HavenaskStore extends Store {
         });
 
         // add entry_table file
-        metadata.put(entryTableFile, new StoreFileMetadata(entryTableFile, entryTableContent.length(), "", HAVENASK_VERSION));
+        metadata.put(entryTablePathStr, new StoreFileMetadata(entryTablePathStr, entryTableContent.length(), "", HAVENASK_VERSION));
 
         return metadata;
     }
@@ -292,7 +294,8 @@ public class HavenaskStore extends Store {
                 Files.move(tempFilePath, filePath);
             } catch (IOException e) {
                 // TODO check if this is the right thing to do
-                throw new RuntimeException(e);
+                // throw new RuntimeException(e);
+                logger.debug("renameHavenaskTempFilesSafe: failed to rename temp file [{}] to [{}]", tempFileName, fileName, e);
             }
         });
     }
