@@ -42,7 +42,7 @@ import org.havenask.common.Strings;
 import org.havenask.engine.index.config.EntryTable;
 import org.havenask.engine.index.engine.EngineSettings;
 import org.havenask.engine.index.engine.HavenaskEngine.HavenaskCommitInfo;
-import org.havenask.engine.util.VersionUtils;
+import org.havenask.engine.util.Utils;
 import org.havenask.env.ShardLock;
 import org.havenask.index.IndexSettings;
 import org.havenask.index.shard.ShardId;
@@ -77,7 +77,8 @@ public class HavenaskStore extends Store {
         MetadataSnapshot luceneSnapshot = super.getMetadata(commit, false);
         Map<String, StoreFileMetadata> metadata = new HashMap<>(luceneSnapshot.asMap());
         if (EngineSettings.isHavenaskEngine(indexSettings.getSettings())) {
-            metadata.putAll(getHavenaskMetadata(commit));
+            // TODO replace null with commit
+            metadata.putAll(getHavenaskMetadata(null));
         }
         return new MetadataSnapshot(metadata, luceneSnapshot.getCommitUserData(), luceneSnapshot.getNumDocs());
     }
@@ -85,7 +86,10 @@ public class HavenaskStore extends Store {
     Map<String, StoreFileMetadata> getHavenaskMetadata(IndexCommit commit) throws IOException {
         long commitVersion = 0;
         if (commit == null) {
-            commitVersion = VersionUtils.getMaxVersion(shardPath, commitVersion);
+            String maxIndexVersionFile = Utils.getIndexMaxVersion(shardPath);
+            if (maxIndexVersionFile != null) {
+                commitVersion = Long.parseLong(maxIndexVersionFile.substring(maxIndexVersionFile.indexOf('.') + 1));
+            }
         } else if (commit.getUserData().containsKey(HavenaskCommitInfo.COMMIT_VERSION_KEY)) {
             commitVersion = Long.valueOf(commit.getUserData().get(HavenaskCommitInfo.COMMIT_VERSION_KEY));
         }

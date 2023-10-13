@@ -39,10 +39,10 @@
 
 package org.havenask.common.lucene.store;
 
-import org.apache.lucene.store.IndexInput;
-
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.apache.lucene.store.IndexInput;
 
 public class InputStreamIndexInput extends InputStream {
 
@@ -78,7 +78,7 @@ public class InputStreamIndexInput extends InputStream {
         } else if (off < 0 || len < 0 || len > b.length - off) {
             throw new IndexOutOfBoundsException();
         }
-        if (indexInput.getFilePointer() >= indexInput.length()) {
+        if (indexInput.getFilePointer() > indexInput.length()) {
             return -1;
         }
         if (indexInput.getFilePointer() + len > indexInput.length()) {
@@ -87,7 +87,7 @@ public class InputStreamIndexInput extends InputStream {
         if (counter + len > limit) {
             len = (int) (limit - counter);
         }
-        if (len <= 0) {
+        if (len < 0) {
             return -1;
         }
         indexInput.readBytes(b, off, len, false);

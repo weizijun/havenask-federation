@@ -114,7 +114,13 @@ public class Utils {
     public static String getIndexMaxVersion(Path versionFilePath) {
         try (Stream<Path> stream = Files.list(versionFilePath)) {
             String maxVersionFile = stream.map(path1 -> path1.getFileName().toString())
-                .filter(s -> s.matches("version\\.\\d+"))
+                .filter(s -> {
+                    if (s.matches("version\\.\\d+")) {
+                        return false == s.startsWith("version.5368");
+                    } else {
+                        return false;
+                    }
+                })
                 .map(s -> Long.parseLong(s.substring(s.indexOf('.') + 1)))
                 .max(Long::compare)
                 .map(max -> "version." + max)
