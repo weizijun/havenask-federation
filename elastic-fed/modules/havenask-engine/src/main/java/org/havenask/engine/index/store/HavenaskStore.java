@@ -333,9 +333,9 @@ public class HavenaskStore extends Store {
 
             if (Files.notExists(shardPath.resolve(name))) {
                 try {
-                    if (metadata.length() < 0) {
+                    if (metadata.length() == Long.MAX_VALUE) {
                         Files.createDirectories(shardPath.resolve(name));
-                    } else {
+                    } else if (metadata.length() == 0) {
                         Files.createFile(shardPath.resolve(name));
                     }
                 } catch (IOException e) {

@@ -918,7 +918,7 @@ public class RecoverySourceHandler {
 
     public void sendFiles(Store store, StoreFileMetadata[] files, IntSupplier translogOps, ActionListener<Void> listener) {
         // 过滤files中文件长度小于等于0的文件
-        files = Arrays.stream(files).filter(f -> f.length() > 0).sorted(
+        files = Arrays.stream(files).filter(f -> f.length() > 0 && f.length() < Long.MAX_VALUE).sorted(
             Comparator.comparingLong(StoreFileMetadata::length)).toArray(
             StoreFileMetadata[]::new); // send smallest first
 
