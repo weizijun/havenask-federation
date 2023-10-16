@@ -78,8 +78,7 @@ public class HavenaskStore extends Store {
         MetadataSnapshot luceneSnapshot = super.getMetadata(commit, false);
         Map<String, StoreFileMetadata> metadata = new HashMap<>(luceneSnapshot.asMap());
         if (EngineSettings.isHavenaskEngine(indexSettings.getSettings())) {
-            // TODO replace null with commit
-            metadata.putAll(getHavenaskMetadata(null));
+            metadata.putAll(getHavenaskMetadata(commit));
         }
         return new MetadataSnapshot(metadata, luceneSnapshot.getCommitUserData(), luceneSnapshot.getNumDocs());
     }
@@ -333,7 +332,7 @@ public class HavenaskStore extends Store {
 
             if (Files.notExists(shardPath.resolve(name))) {
                 try {
-                    if (metadata.length() == Long.MAX_VALUE) {
+                    if (metadata.length() >= Integer.MAX_VALUE) {
                         Files.createDirectories(shardPath.resolve(name));
                     } else if (metadata.length() == 0) {
                         Files.createFile(shardPath.resolve(name));
