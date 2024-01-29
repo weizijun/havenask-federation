@@ -57,7 +57,9 @@ public class HavenaskHttpClient implements HavenaskClient {
         dispatcher.setMaxRequests(500);
         dispatcher.setMaxRequestsPerHost(500);
         client = AccessController.doPrivileged(
-            (PrivilegedAction<OkHttpClient>) () -> new OkHttpClient.Builder().dispatcher(dispatcher).readTimeout(socketTimeout, TimeUnit.SECONDS).build()
+            (PrivilegedAction<OkHttpClient>) () -> new OkHttpClient.Builder().dispatcher(dispatcher)
+                .readTimeout(socketTimeout, TimeUnit.SECONDS)
+                .build()
         );
     }
 
