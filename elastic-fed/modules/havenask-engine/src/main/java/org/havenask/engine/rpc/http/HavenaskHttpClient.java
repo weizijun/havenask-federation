@@ -31,6 +31,7 @@ import org.havenask.engine.rpc.HavenaskClient;
 import org.havenask.engine.rpc.HeartbeatTargetResponse;
 import org.havenask.engine.rpc.UpdateHeartbeatTargetRequest;
 
+import okhttp3.Dispatcher;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -51,8 +52,12 @@ public class HavenaskHttpClient implements HavenaskClient {
 
     public HavenaskHttpClient(int port, long socketTimeout) {
         this.url = "http://127.0.0.1:" + port;
+
+        Dispatcher dispatcher = new Dispatcher();
+        dispatcher.setMaxRequests(500);
+        dispatcher.setMaxRequestsPerHost(500);
         client = AccessController.doPrivileged(
-            (PrivilegedAction<OkHttpClient>) () -> new OkHttpClient.Builder().readTimeout(socketTimeout, TimeUnit.SECONDS).build()
+            (PrivilegedAction<OkHttpClient>) () -> new OkHttpClient.Builder().dispatcher(dispatcher).readTimeout(socketTimeout, TimeUnit.SECONDS).build()
         );
     }
 
