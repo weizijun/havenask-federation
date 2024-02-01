@@ -625,10 +625,21 @@ public class MetaDataSyncer extends AbstractLifecycleComponent implements Cluste
             throw new RuntimeException("localRoutingNode is null");
         }
 
+        TargetInfo.TableGroup soGroup = new TargetInfo.TableGroup();
         for (ShardRouting shardRouting : localRoutingNode) {
             IndexMetadata indexMetadata = clusterState.metadata().index(shardRouting.getIndexName());
             if (EngineSettings.isHavenaskEngine(indexMetadata.getSettings())) {
                 String tableName = Utils.getHavenaskTableName(shardRouting.shardId());
+                if (tableName.startsWith("so")) {
+                    {
+                        if (soGroup.table_names == null) {
+                            soGroup.table_names = new ArrayList<>();
+                        }
+                        soGroup.table_names.add(tableName);
+                    }
+                    continue;
+                }
+
                 String tableGroupName = SEARCHER_ZONE_NAME + ".table_group." + tableName;
                 TargetInfo.TableGroup tableGroup;
                 if (tableGroups.containsKey(tableGroupName)) {
@@ -647,6 +658,11 @@ public class MetaDataSyncer extends AbstractLifecycleComponent implements Cluste
                     tableGroup.unpublish_part_ids.add(shardRouting.getId());
                 }
             }
+        }
+
+        if (soGroup.table_names != null) {
+            String tableGroupName = SEARCHER_ZONE_NAME + ".table_group.so";
+            tableGroups.put(tableGroupName, soGroup);
         }
 
         // add in0 table group

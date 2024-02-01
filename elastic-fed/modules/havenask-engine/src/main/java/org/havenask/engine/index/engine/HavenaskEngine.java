@@ -390,6 +390,10 @@ public class HavenaskEngine extends InternalEngine {
                     throw new IOException("havenask ttargetInfo not ready");
                 }
 
+                if (tableName.startsWith("so")) {
+                    return ;
+                }
+
                 TargetInfo.TableGroup tableGroup = targetInfo.table_groups.get(SQL_DATABASE + ".table_group." + tableName);
                 if (tableGroup == null) {
                     throw new IOException("havenask table not found in searcher table groups");
