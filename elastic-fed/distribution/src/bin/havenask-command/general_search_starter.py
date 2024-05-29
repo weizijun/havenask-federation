@@ -152,7 +152,7 @@ examples:
         self.parser.add_option('', '--kmonSinkAddress', action='store', dest='kmonSinkAddress',
                                default='127.0.0.1')
         self.parser.add_option('', '--specialCatalogList', action='store', dest='specialCatalogList')
-        self.parser.add_option('', '--zk_root', action='store', dest='zkRoot', default='LOCAL')
+        self.parser.add_option('', '--zk_root', action='store', dest='zkRoot', default='LOCAL_LEADER')
         self.parser.add_option('', '--mode', action='store', dest='mode', default='rw')
         self.parser.add_option('', '--leader_election_strategy_type', action='store', dest='leaderElectionStrategyType')
         self.parser.add_option('', '--leader_election_config', action='store', dest='leaderElectionConfig')
