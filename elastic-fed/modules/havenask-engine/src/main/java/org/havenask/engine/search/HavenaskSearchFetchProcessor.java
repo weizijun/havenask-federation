@@ -40,11 +40,13 @@ import org.havenask.search.fetch.subphase.FetchSourceContext;
 import org.havenask.search.internal.InternalSearchResponse;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.havenask.engine.search.rest.RestHavenaskSqlAction.SQL_DATABASE;
@@ -71,7 +73,7 @@ public class HavenaskSearchFetchProcessor {
         String tableName,
         SearchSourceBuilder searchSourceBuilder,
         Boolean sourceEnabled
-    ) throws IOException {
+    ) throws Exception {
         if (searchSourceBuilder == null) {
             throw new IllegalArgumentException("request source can not be null!");
         }
@@ -97,7 +99,7 @@ public class HavenaskSearchFetchProcessor {
         String tableName,
         SearchSourceBuilder searchSourceBuilder,
         Boolean sourceEnabled
-    ) throws IOException {
+    ) throws Exception {
         if (searchSourceBuilder == null) {
             throw new IllegalArgumentException("request source can not be null!");
         }
@@ -147,10 +149,21 @@ public class HavenaskSearchFetchProcessor {
         String tableName,
         FetchSourceContext fetchSourceContext,
         QrsClient qrsClient
-    ) throws IOException {
+    ) throws Exception {
         QrsSqlRequest qrsFetchPhaseSqlRequest = getQrsFetchPhaseSqlRequest(idList, tableName);
         QrsSqlResponse qrsFetchPhaseSqlResponse = qrsClient.executeSql(qrsFetchPhaseSqlRequest);
         SqlResponse fetchPhaseSqlResponse = SqlResponse.parse(qrsFetchPhaseSqlResponse.getResult());
+        if (fetchPhaseSqlResponse.getErrorInfo().getErrorCode() != 0) {
+            throw new SQLException(
+                String.format(
+                    Locale.ROOT,
+                    "execute fetch phase sql failed after transfer dsl to sql: errorCode: %s, error: %s, message: %s",
+                    fetchPhaseSqlResponse.getErrorInfo().getErrorCode(),
+                    fetchPhaseSqlResponse.getErrorInfo().getError(),
+                    fetchPhaseSqlResponse.getErrorInfo().getMessage()
+                )
+            );
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("fetch idList length: {}, havenask sqlResponse took: {} ms", idList.size(), fetchPhaseSqlResponse.getTotalTime());
         }
@@ -159,7 +172,7 @@ public class HavenaskSearchFetchProcessor {
 
     public static QrsSqlRequest getQrsFetchPhaseSqlRequest(List<String> idList, String tableName) {
         StringBuilder sqlQuery = new StringBuilder();
-        sqlQuery.append("select _id, _source, _routing from ").append('`').append(tableName).append("_summary_` where contain('_id','");
+        sqlQuery.append("select _id, _source, _routing from ").append('`').append(tableName).append("_summary_` where contain(_id,'");
         for (int i = 0; i < idList.size(); i++) {
             sqlQuery.append(idList.get(i));
             if (i < idList.size() - 1) {

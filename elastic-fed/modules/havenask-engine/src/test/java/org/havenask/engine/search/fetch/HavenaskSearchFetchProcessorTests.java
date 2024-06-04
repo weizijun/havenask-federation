@@ -43,7 +43,7 @@ public class HavenaskSearchFetchProcessorTests extends HavenaskTestCase {
         List<String> idList = List.of("1", "2", "3");
         String tableName = "table";
         QrsSqlRequest sqlRequest = HavenaskSearchFetchProcessor.getQrsFetchPhaseSqlRequest(idList, tableName);
-        assertEquals(sqlRequest.getSql(), "select _id, _source, _routing from `table_summary_` where contain('_id','1|2|3') limit 3");
+        assertEquals(sqlRequest.getSql(), "select _id, _source, _routing from `table_summary_` where contain(_id,'1|2|3') limit 3");
     }
 
     public void testBuildQuerySearchResult() throws IOException {
@@ -119,7 +119,7 @@ public class HavenaskSearchFetchProcessorTests extends HavenaskTestCase {
         }
     }
 
-    public void testExecuteFetch() throws IOException {
+    public void testExecuteFetch() throws Exception {
         String indexName = "table";
         int docsNum = 3;
         String[] resStr = new String[] {
